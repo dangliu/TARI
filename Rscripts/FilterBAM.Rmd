@@ -1,0 +1,51 @@
+---
+title: "R Filter BAM"
+output: html_notebook
+---
+
+
+```{r}
+library(Rsamtools)
+library(reshape2)
+```
+
+
+```{r}
+filterParm  <- ScanBamParam(what = c("qname","rname","flag", "pos"), tag = c("XS", "YT", "DT"))
+```
+
+```{r}
+ftag= scanBam("/home/tari/tomato/RAD2Core/gatk/BAM/QF0101_r01.dedup.bam", param= filterParm)
+ftag[[1]]
+```
+
+
+```{r}
+x <- DataFrame(ftag[[1]])
+head(x)
+```
+
+```{r}
+isRead1 <- bamFlagAsBitMatrix(x$flag)[,"isFirstMateRead"]==1L
+isRead2 <- !isRead1
+head(isRead1)
+```
+```{r}
+x.pool= merge(x[isRead1, ], x[isRead2, ], by= "qname", all= TRUE, sort= FALSE, suffixes= c(".R1", ".R2"))
+head(x.pool)
+```
+```{r}
+key= (
+		is.na(x.pool$"tag.XS.R1") & is.na(x.pool$"tag.XS.R2") & # unique map
+		x.pool$"tag.YT.R1"== "CP" & # concordant map
+		is.na(x.pool$"tag.DT.R1") & # remove optical duplicate DT.tag== "SQ"
+		as.character(x.pool$"rname.R1") %in% c("SL3.0ch01", "SL3.0ch02", "SL3.0ch03", "SL3.0ch04", "SL3.0ch05", "SL3.0ch06", "SL3.0ch07", "SL3.0ch08", "SL3.0ch09", "SL3.0ch10", "SL3.0ch11", "SL3.0ch12") # & # only target chromosome
+		)
+head(key)
+```
+
+```{r}
+qnames= x.pool$"qname"[key]
+head(qnames)
+```
+

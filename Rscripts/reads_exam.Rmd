@@ -1,0 +1,88 @@
+---
+title: "Tomato 3rd Test Run"
+output: html_notebook
+---
+
+96 ddRAD samples\
+i2 > restriction enzymes: PstI (1st) and MseI (2nd)\
+i6 > restriction enzymes: NsiI (1st) and MseI (2nd)\
+i3 > restriction enzymes: PstI (1st)\
+i7 > restriction enzymes: NsiI (1st)\
+Read length: 75\
+  
+Pre-process:\
+process_rapture.py to demutiplex and remove reads with double barcodes or barcodes not found.\
+process_radtags to eliminate reads with low quality score (<20) or ambiguous RAD-tags.\
+
+---
+
+### Input reads summary table
+```{r}
+reads_table <- read.table('/home/dang/tomato/test3/cleaned/i7/process_radtags_summary.txt', header = TRUE)
+head(reads_table)
+tail(reads_table)
+```
+
+### Calculate median here
+```{r}
+median_retained <- median(reads_table$Retained_Reads)
+median_retained
+median_lowQ <- median(reads_table$Low_Quality)
+median_lowQ
+median_AmbRAD <- median(reads_table$Ambiguous_RAD.Tag)
+median_AmbRAD
+median_total <- median(reads_table$Total)
+median_total
+```
+
+### Use geom_point from ggplot2 to plot
+```{r}
+library(ggplot2)
+```
+
+### Reads count point plot distribution along samples
+  
+#### After process_rapture.py
+```{r}
+p <- ggplot(data=reads_table, aes(x=Total/1000, y=ID))
+p <- p + geom_point() 
+p <- p + theme(axis.line = element_line(colour = "black")) + labs(x="Count (10^3)")
+p <- p + geom_vline(xintercept = median_total/1000, color='red')
+p
+```
+  
+#### After process_radtags
+```{r}
+p <- ggplot(data=reads_table, aes(x=Retained_Reads/1000, y=ID))
+p <- p + geom_point() 
+p <- p + geom_point(data=reads_table, aes(x=Total/1000, y=ID), alpha=0.25)
+p <- p + theme(axis.line = element_line(colour = "black")) + labs(x="Count (10^3)")
+p <- p + geom_vline(xintercept = median_retained/1000, color='red')
+p <- p + geom_vline(xintercept = median_total/1000, color='red', alpha=0.25)
+p
+```
+  
+#### Explore on low quality reads
+```{r}
+p <- ggplot(data=reads_table, aes(x=log10(Retained_Reads), y=ID))
+p <- p + geom_point(color="black") 
+p <- p + geom_point(data=reads_table, aes(x=log10(Low_Quality), y=ID), color="red")
+p <- p + theme(axis.line = element_line(colour = "black")) + labs(x="Count (log10)")
+p <- p + geom_vline(xintercept = log10(median_retained), color='black')
+p <- p + geom_vline(xintercept = log10(median_lowQ), color="red")
+p
+```
+  
+#### Explore on ambiguous RAD-tags
+```{r}
+p <- ggplot(data=reads_table, aes(x=log10(Retained_Reads), y=ID))
+p <- p + geom_point(color="black") 
+p <- p + geom_point(data=reads_table, aes(x=log10(Ambiguous_RAD.Tag
+), y=ID), color="darkgreen")
+p <- p + theme(axis.line = element_line(colour = "black")) + labs(x="Count (log10)")
+p <- p + geom_vline(xintercept = log10(median_retained), color='black')
+p <- p + geom_vline(xintercept = log10(median_AmbRAD), color="darkgreen")
+p
+```
+
+

@@ -1,0 +1,50 @@
+---
+title: "PCA plot for test.ref haplotye popgen output"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. 
+Made by Dang. 10052018.
+Last edited: 10052018.
+
+---
+
+# Set working directory 
+```{r}
+setwd('/home/dang/tomato/test1/tests.ref/stacks.bwa')
+```
+
+
+# Use library Adegenet
+```{r}
+library(adegenet)
+```
+
+# Read input gen file
+```{r}
+x = read.genepop('populations.haps.gen')
+x
+```
+
+# Place samples in their respective populations
+```{r}
+pop(x) = sapply(strsplit(indNames(x), '_'), function(x){x[1]})
+pop(x)
+```
+# Use scaleGen to replace missing data (NA) with non-informative value
+```{r}
+Y = scaleGen(x, NA.method="zero")
+```
+
+
+# Perform PCA
+```{r}
+Y.pca = dudi.pca(Y, scannf=FALSE)
+s.class(Y.pca$li, pop(x), col=rainbow(nPop(x)))
+add.scatter.eig(Y.pca$eig[1:10], xax=1, yax=2)
+```
+
+
+
+
+

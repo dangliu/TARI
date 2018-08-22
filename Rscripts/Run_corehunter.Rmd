@@ -1,0 +1,26 @@
+---
+title: "Core collection"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook for core collection standard procedure. It's made by Dang Liu, last edited 4th June 2018.
+
+# Use library corehunter
+```{r}
+library(corehunter)
+```
+
+# Import data
+Use SNP biparental type format of input data.
+```{r}
+my.data <- genotypes(file = "/home/dang/tomato/test3/corehunter/i2.i3.samples.snps.core.txt", format = "biparental")
+```
+
+# Do core collection!
+Collect 10% of total samples as a core. Use EN-E 0.3 and AN-E 0.7 to compute the metrix.
+```{r}
+core <- sampleCore(my.data, size=0.10, obj=list(objective("EN", "MR",
+weight=0.3),objective("AN", "MR", weight=0.7)), verbose=TRUE)
+core
+```
+
