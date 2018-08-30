@@ -1,0 +1,79 @@
+---
+title: "vcf INFO analysis"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook made by Dang Liu in TARI on 29th Aug. 2018.
+
+
+### Use library ggplot2
+```{r}
+library(ggplot2)
+```
+
+### Read input file
+```{r}
+table <- read.table('/home/tari/tomato/RAD2Core/gatk/GVCF/combined.filtered.vcf.gz_out.txt', header=TRUE)
+head(table)
+```
+
+
+### plot QD
+```{r}
+p <- ggplot(data=table, aes(QD))
+p <- p + geom_density() + geom_vline(xintercept =2, color="red")
+p
+p2 <- ggplot(data=table, aes(QD)) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =2, color="red")
+p2
+```
+
+### plot FS
+```{r}
+p <- ggplot(data=table, aes(FS))
+p <- p + geom_density() + xlim(0, 100) + geom_vline(xintercept =25, color="red")
+p
+p2 <- ggplot(data=table, aes(FS)) + xlim(0, 100) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =25, color="red")
+p2
+```
+
+### plot SOR
+```{r}
+p <- ggplot(data=table, aes(SOR))
+p <- p + geom_density() + geom_vline(xintercept =7, color="red")
+p
+p2 <- ggplot(data=table, aes(SOR)) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =7, color="red")
+p2
+```
+
+### plot MQ
+```{r}
+p <- ggplot(data=table, aes(MQ))
+p <- p + geom_density() + xlim(0,200) + geom_vline(xintercept =20, color="red")
+p
+p2 <- ggplot(data=table, aes(MQ)) + xlim(0,200) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =20, color="red")
+p2
+```
+
+### plot MQRankSum
+```{r}
+p <- ggplot(data=table, aes(MQRankSum))
+p <- p + geom_density() + geom_vline(xintercept =-5, color="red")
+p
+p2 <- ggplot(data=table, aes(MQRankSum)) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =-5, color="red")
+p2
+```
+
+### plot ReadPosRankSum
+```{r}
+p <- ggplot(data=table, aes(ReadPosRankSum))
+p <- p + geom_density() + geom_vline(xintercept =-5, color="red")
+p
+p2 <- ggplot(data=table, aes(ReadPosRankSum)) + geom_density(aes(fill=FILTER), alpha=0.5)
+p2 <- p2 + geom_vline(xintercept =-5, color="red")
+p2
+```
