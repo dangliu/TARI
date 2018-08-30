@@ -10,6 +10,7 @@ python vcf2core.py vcf
 
 # modules here
 import sys, re
+import gzip
 
 # if input number is incorrect, print the usage
 if len(sys.argv) < 2:
@@ -17,7 +18,14 @@ if len(sys.argv) < 2:
 	sys.exit()
 
 # input vcf file
-vcf = open(sys.argv[1], 'r')
+# files can be either gz or not
+# add on 30082018
+if (".gz" in sys.argv[1]):
+	vcf = gzip.open(sys.argv[1], 'r')
+else:
+	vcf = open(sys.argv[1], 'r')
+
+
 
 
 # collections
@@ -50,7 +58,9 @@ while(line):
 		genotype = line_s[9:l-1]
 		n = 9
 		for i in genotype:
-			geno = re.sub(r':[-:,.0-9]*', '', i)
+			# switch from re.sub to re.search with group on 30082018
+			geno = re.search(r'([.01]/[.01]):.*', i).group(1)
+			#print geno
 			sample_dit[n].append(geno_dit[geno])
 			n += 1
 	line = vcf.readline()
@@ -58,7 +68,12 @@ vcf.close()
 print 'loci all collected!'
 
 # output here
-out_f = open(sys.argv[1].replace('vcf', 'core.txt'), 'w')
+if (".gz" in sys.argv[1]):
+	out_f = open(sys.argv[1].replace('vcf.gz', 'core.txt'), 'w')
+else:
+	out_f = open(sys.argv[1].replace('vcf', 'core.txt'), 'w')
+
+
 out_f.write('ID\tNAME\t')
 for i in range(1, k+1):
 	if (i != k):
@@ -81,4 +96,4 @@ print 'All done!'
 #print sample_dit
 
 
-#last_v20180122
+#last_v20180830
